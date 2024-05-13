@@ -1,16 +1,20 @@
+# Alle notwendigen imports
 import streamlit as st
 import googlemaps
 import pandas as pd
 import requests
 from datetime import datetime
 
-# Funktion zum Abrufen der Zugroute von Google Maps API mit einem GET-Request und festgelegter Ankunftszeit
+# Funktion zum Abrufen der Zugroute von Google Maps API mit einem GET-Request und festgelegter Ankunftszeit, die departure_time muss nicht angegeben werden, da sie sich aus der arrival_time ableitet
 def get_train_route(api_key, start_location, end_location, arrival_time):
+    # Get request von der google maps directions API
     url = f"https://maps.googleapis.com/maps/api/directions/json?origin={start_location}&destination={end_location}&mode=transit&transit_mode=rail&arrival_time={arrival_time}&key={api_key}"
     response = requests.get(url)
+    # Wenn der code = 200 (OK) ist, kann fortgefahren werden
     if response.status_code == 200:
+        # Die Antwort wird in das json Format gebracht, um sie weiterverwenden zu können
         data = response.json()
-        # Verarbeite die Daten und extrahiere relevante Informationen
+        # Nun wird über die ausgegebenen Daten iteriert und den benötigten daten zugewiesen
         if "routes" in data and len(data["routes"]) > 0:
             steps = data["routes"][0]["legs"][0]["steps"]
             processed_data = []
@@ -19,7 +23,7 @@ def get_train_route(api_key, start_location, end_location, arrival_time):
                 if step['travel_mode'] == 'TRANSIT':
                     departure_station = step['transit_details']['departure_stop']['name']
                     arrival_station = step['transit_details']['arrival_stop']['name']
-                    # Linie entfernen
+                    # Linie entfernen, diese werden nicht benötigt, da sie nur für Tram und Buslinien angegeben ist und ansonsten leer bleibt
                     line = ""
                     departure_time = step['transit_details']['departure_time']['text']
                     arrival_time = step['transit_details']['arrival_time']['text']
@@ -33,12 +37,13 @@ def get_train_route(api_key, start_location, end_location, arrival_time):
                         'arrival_time': arrival_time,
                         'duration': duration
                     })
-
+            # Zurück gegeben wird der Dataframe, welcher die wichtigsten Daten im Überblick darstellt
             return pd.DataFrame(processed_data), route_coordinates
     return None, None
 
-# Funktion zur Umwandlung von Ortsnamen in Koordinaten
+# Funktion zur Umwandlung von Ortsnamen in Koordinaten, mit Hilfe der google maps geocode API
 def get_coordinates(place, api_key):
+    # Get request von der google maps geocode API
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={place}&key={api_key}"
     response = requests.get(url)
     if response.status_code == 200:
