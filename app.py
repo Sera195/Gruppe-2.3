@@ -100,7 +100,7 @@ def main():
             else:
                 st.warning("Keine Route gefunden.")
     else:
-        st.warning("Bitte geben Sie Ihren Google Maps API-Schlüssel ein, stellen Sie sicher, dass die Start- und Zielorte gültig sind, und verwenden Sie das richtige Datumsformat (dd.mm.yyyy-HH:MM).")
+        st.warning("Bitte stellen Sie sicher, dass die Start- und Zielorte gültig sind, und verwenden Sie das richtige Datumsformat.")
 
 # Starte die Streamlit-App
 if __name__ == "__main__":
