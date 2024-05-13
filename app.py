@@ -51,7 +51,7 @@ def get_coordinates(place, api_key):
 # Funktion zur Umwandlung von Datum und Uhrzeit in UNIX-Zeitstempel
 def convert_to_unix_timestamp(datetime_str):
     try:
-        datetime_obj = datetime.strptime(datetime_str, '%d.%m.%Y-%I:%M')
+        datetime_obj = datetime.strptime(datetime_str, '%d.%m.%Y-%H:%M')
         unix_timestamp = int(datetime_obj.timestamp())
         return unix_timestamp
     except ValueError:
