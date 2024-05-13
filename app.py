@@ -106,12 +106,12 @@ def Endroute():
                 train_route.drop(columns=['Linie'], inplace=True, errors='ignore')
 
                 # Zeige die Zugroute als Tabelle an
-                st.subheader(f"Zugroute von {start_location} nach {end_location}")
+                st.subheader(f"Überlblick für die Zugroute von {start_location} nach {end_location}")
                 st.write(train_route)
 
                 # Erstellen der google maps Karten für die einzelnen Routen
                 # Mit Hilfe von ChatGPT
-                st.subheader(f"Zugroute von {start_location} nach {end_location} auf Karte anzeigen")
+                st.subheader(f"Zugroute von {start_location} nach {end_location} visualisiert")
                 st.markdown(f'<iframe width="100%" height="500" src="https://www.google.com/maps/embed/v1/directions?key={api_key}&origin={start_lat},{start_lng}&destination={end_lat},{end_lng}&mode=transit" allowfullscreen></iframe>', unsafe_allow_html=True)
             else:
                 st.warning("Keine Route gefunden.")
