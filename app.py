@@ -8,6 +8,7 @@ from datetime import datetime
 # Funktion zum Abrufen der Zugroute von Google Maps API mit einem GET-Request und festgelegter Ankunftszeit, die departure_time muss nicht angegeben werden, da sie sich aus der arrival_time ableitet
 def get_train_route(api_key, start_location, end_location, arrival_time):
     # Get request von der google maps directions API
+    # Quelle: https://www.youtube.com/watch?v=yOXQAmYl0Aw&t=105s
     url = f"https://maps.googleapis.com/maps/api/directions/json?origin={start_location}&destination={end_location}&mode=transit&transit_mode=rail&arrival_time={arrival_time}&key={api_key}"
     response = requests.get(url)
     # Wenn der code = 200 (OK) ist, kann fortgefahren werden
@@ -15,6 +16,7 @@ def get_train_route(api_key, start_location, end_location, arrival_time):
         # Die Antwort wird in das json Format gebracht, um sie weiterverwenden zu können
         data = response.json()
         # Nun wird über die ausgegebenen Daten iteriert und den benötigten daten zugewiesen
+        # Mit Hilfe von ChatGPT
         if "routes" in data and len(data["routes"]) > 0:
             steps = data["routes"][0]["legs"][0]["steps"]
             processed_data = []
@@ -44,6 +46,7 @@ def get_train_route(api_key, start_location, end_location, arrival_time):
 # Funktion zur Umwandlung von Ortsnamen in Koordinaten, mit Hilfe der google maps geocode API
 def get_coordinates(place, api_key):
     # Get request von der google maps geocode API
+    # Quelle: https://www.youtube.com/watch?v=yOXQAmYl0Aw&t=105s
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={place}&key={api_key}"
     response = requests.get(url)
     if response.status_code == 200:
@@ -57,6 +60,7 @@ def get_coordinates(place, api_key):
 # Funktion zur Umwandlung von Datum und Uhrzeit in UNIX-Zeitstempel
 # Da Google den UNIX-Zeitstempel verwendet und die Angabe ansonsten nicht verarbeitet werden kann
 # UNIX-Zeitstempel gibt die Anzahl der Sekunden an, die seit dem 01.01.1970 vergangen sind. (https://www.confirado.de/tools/timestamp-umrechner.html#:~:text=Was%20ist%20ein%20Unix%20Timestamp,PHP%20und%20MySQL%2DDatenbanken%20ben%C3%B6tigt.)
+# Mit Hilfe von https://stackoverflow.com/questions/19801727/convert-datetime-to-unix-timestamp-and-convert-it-back-in-python
 def convert_to_unix_timestamp(datetime_str):
     try:
         datetime_obj = datetime.strptime(datetime_str, '%d.%m.%Y-%H:%M')
@@ -76,6 +80,7 @@ def Endroute():
 
     # Abfrage der Abfahrtsorte, mit default Werten
     start_locations = st.text_input("""Abfahrtsorte eingeben (getrennt durch ";" )""", "Zürich HB, Schweiz; Bern, Schweiz; Basel, Schweiz")
+    # Erstellen einer Liste mit den separierten Abfahrtsorten
     start_locations_list = [x.strip() for x in start_locations.split(';')]
 
     # Abfrage des Ankuftsziels, mit default Wert Genf
@@ -105,6 +110,7 @@ def Endroute():
                 st.write(train_route)
 
                 # Erstellen der google maps Karten für die einzelnen Routen
+                # Mit Hilfe von ChatGPT
                 st.subheader(f"Zugroute von {start_location} nach {end_location} auf Karte anzeigen")
                 st.markdown(f'<iframe width="100%" height="500" src="https://www.google.com/maps/embed/v1/directions?key={api_key}&origin={start_lat},{start_lng}&destination={end_lat},{end_lng}&mode=transit" allowfullscreen></iframe>', unsafe_allow_html=True)
             else:
