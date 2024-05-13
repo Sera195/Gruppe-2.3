@@ -106,7 +106,7 @@ def Endroute():
                 train_route.drop(columns=['Linie'], inplace=True, errors='ignore')
 
                 # Zeige die Zugroute als Tabelle an
-                st.subheader(f"Überlblick für die Zugroute von {start_location} nach {end_location}")
+                st.subheader(f"Überblick für die Zugroute von {start_location} nach {end_location}")
                 st.write(train_route)
 
                 # Erstellen der google maps Karten für die einzelnen Routen
