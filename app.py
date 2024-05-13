@@ -103,5 +103,4 @@ def main():
         st.warning("Bitte stellen Sie sicher, dass die Start- und Zielorte gültig sind, und verwenden Sie das richtige Datumsformat.")
 
 # Starte die Streamlit-App
-if __name__ == "__main__":
-    main()
+main()
