@@ -52,9 +52,8 @@ def get_coordinates(place, api_key):
 def convert_to_unix_timestamp(datetime_str):
     try:
         datetime_obj = datetime.strptime(datetime_str, '%d.%m.%Y-%H:%M')
-        unix_timestamp = int(datetime_obj.timestamp())
-        unix_timestamp1 = unix_timestamp - 7200
-        return unix_timestamp1
+        unix_timestamp = int(datetime_obj.timestamp())-7200
+        return unix_timestamp
     except ValueError:
         return None
 
