@@ -49,11 +49,14 @@ def get_coordinates(place, api_key):
     if response.status_code == 200:
         data = response.json()
         if "results" in data and len(data["results"]) > 0:
+            # Die Daten werden in location als Koordinate gespeichert und können im nächsten Schritt weiterverwendet werden
             location = data["results"][0]["geometry"]["location"]
             return location["lat"], location["lng"]
     return None, None
 
 # Funktion zur Umwandlung von Datum und Uhrzeit in UNIX-Zeitstempel
+# Da Google den UNIX-Zeitstempel verwendet und die Angabe ansonsten nicht verarbeitet werden kann
+# UNIX-Zeitstempel gibt die Anzahl der Sekunden an, die seit dem 01.01.1970 vergangen sind. (https://www.confirado.de/tools/timestamp-umrechner.html#:~:text=Was%20ist%20ein%20Unix%20Timestamp,PHP%20und%20MySQL%2DDatenbanken%20ben%C3%B6tigt.)
 def convert_to_unix_timestamp(datetime_str):
     try:
         datetime_obj = datetime.strptime(datetime_str, '%d.%m.%Y-%H:%M')
@@ -63,32 +66,34 @@ def convert_to_unix_timestamp(datetime_str):
         return None
 
 # Hauptfunktion für die Streamlit-App
-def main():
-    # Setze den Titel der Streamlit-App
+def Endroute():
+    # Titel des Projekts
     st.title("TrainMeet")
 
-    # Lese den API-Schlüssel aus Streamlit
+    # Lesen des versteckten google maps API key aus streamlit
+    # Quelle: https://www.youtube.com/watch?v=oWxAZoyyzCc
     api_key = st.secrets["auth_key"]
 
-    # Startorte eingeben
+    # Abfrage der Abfahrtsorte, mit default Werten
     start_locations = st.text_input("""Abfahrtsorte eingeben (getrennt durch ";" )""", "Zürich HB, Schweiz; Bern, Schweiz; Basel, Schweiz")
     start_locations_list = [x.strip() for x in start_locations.split(';')]
 
-    # Zielort eingeben
+    # Abfrage des Ankuftsziels, mit default Wert Genf
     end_location = st.text_input("Zielort eingeben", "Genève, Schweiz")
 
-    # Ankunftszeit für die Zugroute eingeben
+    # Abfrage der Ankunftszeit aller Routen, kann aufgrund der convert_to_unix_timestamp funktion in normaler Schreibweise eingegeben werden
     arrival_time_str = st.text_input("Ankunftszeit eingeben", "13.05.2024-19:00", max_chars=16)
 
-    # Umwandlung des eingegebenen Datums in einen UNIX-Zeitstempel
+    # Diese Funktion wird nun angewendet
     arrival_time = convert_to_unix_timestamp(arrival_time_str)
 
-    # Wenn ein API-Schlüssel vorhanden ist und Start- und Zielort gültig sind
+    # Wenn alles richtig angegeben wurde kann nun normal weitergemacht werden
+    # Alle in den vorherigen Funktionen gesammelten Daten werden nun zusammengebracht
     if api_key and start_locations_list and end_location and arrival_time is not None:
         for start_location in start_locations_list:
             start_lat, start_lng = get_coordinates(start_location, api_key)
             end_lat, end_lng = get_coordinates(end_location, api_key)
-            # Rufe die Zugroute und die Koordinaten ab
+            # Abrufen der Zugroute und der Koordinaten
             train_route, route_coordinates = get_train_route(api_key, f"{start_lat},{start_lng}", f"{end_lat},{end_lng}", arrival_time)
             
             if train_route is not None:
@@ -99,13 +104,14 @@ def main():
                 st.subheader(f"Zugroute von {start_location} nach {end_location}")
                 st.write(train_route)
 
-                # Erstelle eine Google Maps-Karte für die Zugroute
+                # Erstellen der google maps Karten für die einzelnen Routen
                 st.subheader(f"Zugroute von {start_location} nach {end_location} auf Karte anzeigen")
                 st.markdown(f'<iframe width="100%" height="500" src="https://www.google.com/maps/embed/v1/directions?key={api_key}&origin={start_lat},{start_lng}&destination={end_lat},{end_lng}&mode=transit" allowfullscreen></iframe>', unsafe_allow_html=True)
             else:
                 st.warning("Keine Route gefunden.")
+    # Falls etwas falsch eingegeben wurde erscheint der folgende Error            
     else:
         st.warning("Bitte stellen Sie sicher, dass die Start- und Zielorte gültig sind, und verwenden Sie das richtige Datumsformat.")
 
-# Starte die Streamlit-App
-main()
+# Ausführen der Hauptfunktion und damit starten der App
+Endroute()
